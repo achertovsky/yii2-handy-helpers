@@ -29,15 +29,19 @@ class Log
         }
         $logger = self::getInitialLogger();
         $targets = $logger->dispatcher->targets;
-        foreach ($targets as $key => $target) {
-            if ($dontTouchEmailLogs && $target instanceof EmailTarget) {
-                continue;
+        if ($category != '*') {
+            foreach ($targets as $key => $target) {
+                if ($dontTouchEmailLogs && $target instanceof EmailTarget) {
+                    continue;
+                }
+                $target->except = ArrayHelper::merge(
+                    $target->except,
+                    $category
+                );
+                $targets[$key] = $target;
             }
-            $target->except = ArrayHelper::merge(
-                $target->except,
-                $category
-            );
-            $targets[$key] = $target;
+        } else {
+            $targets = [];
         }
         $logger->dispatcher->targets = $targets;
         self::setLogger($logger);
