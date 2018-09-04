@@ -4,7 +4,6 @@ namespace achertovsky\helpers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\log\EmailTarget;
 
 class Log
 {
@@ -19,10 +18,10 @@ class Log
     /**
      * Overrides except of logger on the fly
      * @param string|array $category
-     * @param boolean $dontTouchEmailLogs
-     * in case of true this param wont allow helper to change EmailTarget components
+     * @param array $dontTouchClasses
+     * classes listed in this array and their descendants wont be ignored
      */
-    public static function ignoreCategory($category, $dontTouchEmailLogs = false)
+    public static function ignoreCategory($category, $dontTouchClasses = [])
     {
         if (!is_array($category)) {
             $category = [$category];
@@ -30,8 +29,10 @@ class Log
         $logger = self::getInitialLogger();
         $targets = $logger->dispatcher->targets;
         foreach ($targets as $key => $target) {
-            if ($dontTouchEmailLogs && $target instanceof EmailTarget) {
-                continue;
+            foreach ($dontTouchClasses as $class) {
+                if ($target instanceof $class) {
+                    continue 2;
+                }
             }
             if ($category == ['*']) {
                 unset($targets[$key]);
