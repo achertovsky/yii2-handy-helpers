@@ -1,6 +1,6 @@
 <?php
 
-namespace common\traits;
+namespace achertovsky\helpers;
 
 use Yii;
 use yii\base\Model;
